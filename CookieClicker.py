@@ -6,11 +6,7 @@ class CookieBot(object):
     def __init__(self):
         print("Init started..")
         self.pos_cookie = [390,628]
-        self.pos_cursor = [2470,380]
-        self.pos_grandma = [2470,447]
-        self.pos_farm = [2470,510]
-        self.pos_mine = [2470,575]
-        self.pos_factory = [2470,640]
+
         self.pos_upgrade_cursor = [2272,279]
         self.pos_achievement_x = [1410,1341]
 
@@ -19,11 +15,14 @@ class CookieBot(object):
 
         self.color_backround = [20,50,70]
 
-        self.counter_cursor = 0
-        self.counter_grandma = 0
-        self.counter_farm = 0
-        self.counter_mine = 0
-        self.counter_factory = 0
+        #Database:
+        self.start_max = 25
+        # X / Y / counter / max_buy
+        self.building_cursor = [2470,380,0,self.start_max]
+        self.building_grandma = [2470,447,0,self.start_max]
+        self.building_farm = [2470,510,0,self.start_max]
+        self.building_mine = [2470,575,0,self.start_max]
+        self.building_factory = [2470,640,0,self.start_max]
 
         self.buy_upgrades = True
         self.buy_buildings = True
@@ -36,7 +35,6 @@ class CookieBot(object):
         self.color_last_upgrade = [0,0,0]
 
         self.klicks_per_run = 60
-        self.max_buy = 25
         self.abweichung = [25,25,25] #in Pixeln pro wert
         print("Init ready..")
         
@@ -69,20 +67,20 @@ class CookieBot(object):
 
             if skip_buy == False:
                 if screen_data[1] == 0 and screen_data[2]:
-                    self.click(self.pos_cursor[0], self.pos_cursor[1], 1)
-                    self.counter_cursor +=1
+                    self.click(self.building_cursor[0], self.building_cursor[1], 1)
+                    self.building_cursor[2] +=1
                 elif screen_data[1] == 1 and screen_data[2]:
-                    self.click(self.pos_grandma[0], self.pos_grandma[1], 1)
-                    self.counter_grandma +=1
+                    self.click(self.building_grandma[0], self.building_grandma[1], 1)
+                    self.building_grandma[2] +=1
                 elif screen_data[1] == 2 and screen_data[2]:
-                    self.click(self.pos_farm[0], self.pos_farm[1], 1)
-                    self.counter_farm +=1
+                    self.click(self.building_farm[0], self.building_farm[1], 1)
+                    self.building_farm[2] +=1
                 elif screen_data[1] == 3 and screen_data[2]:
-                    self.click(self.pos_mine[0], self.pos_mine[1], 1)
-                    self.counter_mine +=1
+                    self.click(self.building_mine[0], self.building_mine[1], 1)
+                    self.building_mine[2] +=1
                 elif screen_data[1] == 4 and screen_data[2]:
-                    self.click(self.pos_factory[0], self.pos_factory[1], 1)
-                    self.counter_factory +=1
+                    self.click(self.building_factory[0], self.building_factory[1], 1)
+                    self.building_factory[2] +=1
 
             if screen_data[3] == True:
                 self.last_buy += 1
@@ -104,29 +102,29 @@ class CookieBot(object):
         item_id = 0
         screen = pyautogui.screenshot()
 
-        if self.counter_cursor < self.max_buy:
+        if self.building_cursor[2] < self.building_cursor[3]:
             item_id = 0
-            pixel = screen.getpixel((self.pos_cursor[0],self.pos_cursor[1]))
+            pixel = screen.getpixel((self.building_cursor[0],self.building_cursor[1]))
             cursorIsAvailable = self.check_pixel(pixel,self.color_available)
             cursorIsNotAvailable = self.check_pixel(pixel,self.color_not_available)
-        elif self.counter_grandma < self.max_buy:
+        elif self.building_grandma[2] < self.building_grandma[3]:
             item_id = 1
-            pixel = screen.getpixel((self.pos_grandma[0],self.pos_grandma[1]))
+            pixel = screen.getpixel((self.building_grandma[0],self.building_grandma[1]))
             cursorIsAvailable = self.check_pixel(pixel,self.color_available)
             cursorIsNotAvailable = self.check_pixel(pixel,self.color_not_available)
-        elif self.counter_farm < self.max_buy:
+        elif self.building_farm[2] < self.building_farm[3]:
             item_id = 2
-            pixel = screen.getpixel((self.pos_farm[0],self.pos_farm[1]))
+            pixel = screen.getpixel((self.building_farm[0],self.building_farm[1]))
             cursorIsAvailable = self.check_pixel(pixel,self.color_available)
             cursorIsNotAvailable = self.check_pixel(pixel,self.color_not_available)
-        elif self.counter_mine < self.max_buy:
+        elif self.building_mine[2] < self.building_mine[3]:
             item_id = 3
-            pixel = screen.getpixel((self.pos_mine[0],self.pos_mine[1]))
+            pixel = screen.getpixel((self.building_mine[0],self.building_mine[1]))
             cursorIsAvailable = self.check_pixel(pixel,self.color_available)
             cursorIsNotAvailable = self.check_pixel(pixel,self.color_not_available)
-        elif self.counter_factory < self.max_buy:
+        elif self.building_factory[2] < self.building_factory[3]:
             item_id = 4
-            pixel = screen.getpixel((self.pos_factory[0],self.pos_factory[1]))
+            pixel = screen.getpixel((self.building_factory[0],self.building_factory[1]))
             cursorIsAvailable = self.check_pixel(pixel,self.color_available)
             cursorIsNotAvailable = self.check_pixel(pixel,self.color_not_available)
 
@@ -143,6 +141,7 @@ class CookieBot(object):
         
         self.color_last_upgrade = [pixel[0],pixel[1],pixel[2]]
 
+        """
         try:
             gc_location = screen.locateOnScreen('Golden_Cookie.png', grayscale=True)
             x = gc_location[0] + 30
@@ -150,6 +149,7 @@ class CookieBot(object):
             self.click(x,y,1)
         except:
             pass
+        """
 
         returnvalue = [upgradeCursorIsAvailable, item_id, cursorIsAvailable, cursorIsNotAvailable]
         return returnvalue
@@ -188,20 +188,20 @@ class CookieBot(object):
             counter +=1
 
     def game_rule(self):
-        if self.counter_grandma >= 20: ##mx buy modifikator hinzufügen
-            self.counter_cursor = 35
-        if self.counter_farm >= 20:
-            self.counter_cursor = 50
-            self.counter_grandma = 35
-        if self.counter_mine >= 20:
-            self.counter_cursor = 65
-            self.counter_grandma = 50
-            self.counter_farm = 35
-        if self.counter_factory >= 20:
-            self.counter_cursor = 80
-            self.counter_grandma = 65
-            self.counter_farm = 50
-            self.counter_mine = 35
+        if self.building_grandma[2] == self.start_max:
+            self.building_cursor[3] = 40
+        if self.building_farm[2] == self.start_max:
+            self.building_cursor[3] = 55
+            self.building_grandma[3] = 40
+        if self.building_mine[2] == self.start_max:
+            self.building_cursor[3] = 70
+            self.building_grandma[3] = 55
+            self.building_farm[3] = 40
+        if self.building_factory[2] == self.start_max:
+            self.building_cursor[3] = 85
+            self.building_grandma[3] = 70
+            self.building_farm[3] = 55
+            self.building_mine[3] = 40
 
 
 
