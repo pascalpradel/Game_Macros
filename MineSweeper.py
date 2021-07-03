@@ -1,4 +1,3 @@
-import keyboard
 import time
 import pyautogui
 
@@ -39,6 +38,7 @@ class MineSweeperBot(object):
         #print(self.board)
 
         self.fill_probability()
+        print(self.prob_board)
 
 
     def fill_probability(self):
@@ -79,22 +79,39 @@ class MineSweeperBot(object):
                     counter_x = -1
                     counter_y = -1
 
+                    blue_counter = 0
+
                     while counter_x < 2:
                         while counter_y < 2:
-                            if x-counter_x >= 0 and y-counter_y >= 0 and x+counter_x <= self.count_rows and y+counter_y <= self.count_lines:
+                            if x+counter_x >= 0 and y+counter_y >= 0 and x+counter_x <= self.count_rows and y+counter_y <= self.count_lines:
                                 box_data = self.board[x+counter_x][y+counter_y]
                                 field_input = [x+counter_x, y+counter_y, box_data[2]]
                                 box_field[counter_x+1][counter_y+1] = field_input
+                                if box_data[2] == 0:
+                                    blue_counter += 1
                             else:
                                 box_field[counter_x+1][counter_y+1] = [404,404,404]
 
                             counter_y += 1
                         counter_y = -1
                         counter_x += 1
+
+                    if blue_counter > 0:
+                        a_iterator = 0
+                        b_iteraror = 0
+
+                        while a_iterator < 3:
+                            while b_iteraror < 3:
+                                box_field_data = box_field[a_iterator][b_iteraror]
+                                if box_field_data[2] == 0:
+                                    self.prob_board[box_field_data[0]][box_field_data[1]] += int(percentage/blue_counter)
+                                b_iteraror += 1
+                            a_iterator += 1
+                            b_iteraror = 0
                     
-                    print("X: " + str(x) + " " + "Y: " + str(y))
-                    print(box)
-                    print(box_field)
+                    #print("X: " + str(x) + " " + "Y: " + str(y))
+                    #print(box)
+                    #print(box_field)
 
                 j += 1
             i += 1
