@@ -1,6 +1,8 @@
 import time
 import pyautogui
 import keyboard
+import cv2
+import numpy as np
 
 class MineSweeperBot(object):
     def __init__(self):
@@ -32,6 +34,7 @@ class MineSweeperBot(object):
 
         self.rounds_since_last_klick = 0
 
+        self.size_scale = 2
         print("Init ready..")
         
 
@@ -53,9 +56,19 @@ class MineSweeperBot(object):
             #print(self.board)
             #print(self.prob_board)
 
+            image1 = self.target_boxes()
+
             self.execute_order()
 
+            image2 = self.target_boxes()
+            self.show_image(image1, image2)
+
             time.sleep(0.25)
+            while True:
+                if keyboard.is_pressed('ctrl') == True:
+                    time.sleep(0.5)
+                    break
+            
 
 
     def fill_probability(self):
@@ -258,7 +271,6 @@ class MineSweeperBot(object):
         #print(lowest_number)
         #print(highest_number)
         #exit()
-        
 
 
     def leftclick(self, x, y):
@@ -268,6 +280,53 @@ class MineSweeperBot(object):
     def rightclick(self, x, y):
         pyautogui.moveTo(x, y)
         pyautogui.click(button='right')
+
+    
+    def target_boxes(self):
+        screenshot = np.array(pyautogui.screenshot())
+
+        i = 0
+        j = 0
+
+        while i < self.count_rows:
+            while j < self.count_lines:
+                prob_board_data = self.prob_board[j][i]
+                board_data = self.board[j][i]
+
+                label = str(prob_board_data[0]) + "/" + str(prob_board_data[1])
+
+                x = board_data[0]-int(self.box_size[0]/2)
+                cv2.putText(screenshot,label,(x,board_data[1]),cv2.FONT_HERSHEY_COMPLEX,1,(0,0,0),1)
+
+                j += 1
+            i += 1
+            j = 0
+        
+        x_end = int(self.start_point[0] + (self.count_rows*self.box_size[0]) + (self.count_rows*self.abstand_x))
+        y_end = int(self.start_point[1] + (self.count_lines*self.box_size[1]) + (self.count_lines*self.abstand_y))
+
+        screenshot = screenshot[self.start_point[1]:y_end, self.start_point[0]:x_end]
+        screenshot = cv2.resize(screenshot, (screenshot.shape[1] // self.size_scale, screenshot.shape[0] // self.size_scale))
+        screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+
+        return screenshot
+        
+    def show_image(self, image1, image2):
+        screenshot = np.array(pyautogui.screenshot())
+
+        y_end = int(self.start_point[1] + (self.count_lines*self.box_size[1]) + (self.count_lines*self.abstand_y))
+        screenshot = screenshot[self.start_point[1]:y_end, self.start_point[0]-50:self.start_point[0]-25]
+
+        screenshot = cv2.resize(screenshot, (screenshot.shape[1] // self.size_scale, screenshot.shape[0] // self.size_scale))
+
+        screenshot_comb = np.concatenate((image1, screenshot), axis=1)
+        screenshot_comb = np.concatenate((screenshot_comb, image2), axis=1)
+        cv2.imshow("screenshot", screenshot_comb)
+        cv2.waitKey(1)
+
+    def blick_in_die_zukunft(self,x_cord,y_cord):
+        
+
 
 
 
