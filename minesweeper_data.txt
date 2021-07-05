@@ -40,3 +40,18 @@
             data = self.board[highest_number[0]][highest_number[1]]
             print("Right-Klick: " + str(highest_number[0]) + " /" +  str(highest_number[1]))
             self.rightclick(data[0],data[1])
+
+#############################################################################################################################################
+
+elif self.check_pixel(pixel, self.color_flag, [25,25,200]):
+    box_id = 2 #"FLAG"
+elif self.check_pixel(pixel, self.color_flag_2, self.abweichung):
+    box_id = 2 #"FLAG"
+elif self.check_pixel(pixel, self.color_one, [25,120,25]):
+    box_id = 3 #"EINS"
+elif self.check_pixel(pixel, self.color_one_2, self.abweichung):
+    box_id = 3 #"EINS"
+elif self.check_pixel(pixel, self.color_two, [80,70,130]):
+    box_id = 4 #"ZWEI"
+elif self.check_pixel(pixel, self.color_three, [80,70,130]):
+    box_id = 5 #"DREI"

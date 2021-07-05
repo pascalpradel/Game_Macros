@@ -7,9 +7,19 @@ import numpy as np
 class MineSweeperBot(object):
     def __init__(self):
         print("Init started..")
-        self.count_rows = 9
-        self.count_lines = 9
-        
+
+        ############SETTINGS############
+        self.count_rows = 16
+        self.count_lines = 16
+
+        self.start_point = [580,135]
+
+        self.box_size = [63,62]
+
+        self.abstand_x = 4
+        self.abstand_y = 5
+        ################################
+
         self.board = [[0 for x in range(self.count_rows)] for y in range(self.count_lines)] 
         self.prob_board = [[0 for x in range(self.count_rows)] for y in range(self.count_lines)] 
 
@@ -22,12 +32,6 @@ class MineSweeperBot(object):
         #self.color_one_2 = [50,190,218]
         #self.color_two = [134,165,60]
         #self.color_three = [216,26,101]
-
-        self.start_point = [580,136]
-
-        self.box_size = [113,110]
-        self.abstand_x = 6.5
-        self.abstand_y = 9
 
         self.abweichung = [25,25,25] #in Pixeln
 
@@ -45,24 +49,22 @@ class MineSweeperBot(object):
 
         self.leftclick(int(self.start_point[0]+self.box_size[0]/2),int(self.start_point[1]+self.box_size[1]/2))
 
-        
-
+        self.fill()
         while True:
             if keyboard.is_pressed('esc') == True:
                     print("Bye..")
                     exit()
 
-            self.fill()
             self.screen_read()
             self.fill_probability(self.prob_board)
-            image1 = self.target_boxes()
+            image1 = self.target_boxes(1)
             
             self.rule_clear_field()
             self.execute_order()
 
             time.sleep(1)  
 
-            image2 = self.target_boxes()
+            image2 = self.target_boxes(2)
             self.show_image(image1, image2)
 
             #print(self.board)
@@ -92,7 +94,6 @@ class MineSweeperBot(object):
                 y = j
                 item_id = box[2]
                 
-
                 if item_id >= 2:
                     if item_id == 3:
                         percentage = 100
@@ -203,20 +204,20 @@ class MineSweeperBot(object):
                 x_pixel = int(box[0] - int(self.box_size[0]/2))
                 y_pixel = int(box[1] - int(self.box_size[1]/2))
 
-                if self.check_pixel(pixel, self.color_blue, self.abweichung):
+                if pyautogui.locateOnScreen('one_16x16.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
+                    box_id = 3 #"ONE"
+                elif self.check_pixel(pixel, self.color_blue, self.abweichung):
                     box_id = 0 #"BLAU"
-                elif pyautogui.locateOnScreen('white.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=False, confidence=0.9) != None:
+                elif pyautogui.locateOnScreen('white_16x16.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=False, confidence=0.9) != None:
                     box_id = 1 #"WEIß" 
-                elif pyautogui.locateOnScreen('flag.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
-                    box_id = 2
-                elif pyautogui.locateOnScreen('one.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
-                    box_id = 3
-                elif pyautogui.locateOnScreen('two.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
-                    box_id = 4
-                elif pyautogui.locateOnScreen('three.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
-                    box_id = 5
-                elif pyautogui.locateOnScreen('four.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
-                    box_id = 6
+                elif pyautogui.locateOnScreen('flag_16x16.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
+                    box_id = 2 #"FLAG"
+                elif pyautogui.locateOnScreen('two_16x16.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
+                    box_id = 4 #"TWO"
+                elif pyautogui.locateOnScreen('three_16x16.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
+                    box_id = 5 #"THREE"
+                elif pyautogui.locateOnScreen('four_16x16.PNG', region=(x_pixel,y_pixel, self.box_size[0], self.box_size[1]), grayscale=True, confidence=0.9) != None:
+                    box_id = 6 #"FOUR"
                 else:
                     print("Error: Color/Picture not found at: " + str(i+1) + "/" + str(j+1))
                     error_counter += 1
@@ -292,13 +293,17 @@ class MineSweeperBot(object):
     def leftclick(self, x, y):
         pyautogui.moveTo(x, y)
         pyautogui.click(button='left')
+        pyautogui.moveTo(self.start_point[0], self.start_point[1])
 
     def rightclick(self, x, y):
         pyautogui.moveTo(x, y)
         pyautogui.click(button='right')
+        pyautogui.moveTo(self.start_point[0], self.start_point[1])
 
     
-    def target_boxes(self):
+    def target_boxes(self, id):
+        label = ""
+
         screenshot = np.array(pyautogui.screenshot())
 
         i = 0
@@ -309,9 +314,12 @@ class MineSweeperBot(object):
                 prob_board_data = self.prob_board[j][i]
                 board_data = self.board[j][i]
 
-                label = str(board_data[2]) + "/" + str(prob_board_data[0]) + "/" + str(prob_board_data[1])
+                if id == 1:
+                    label = str(board_data[2])
+                elif id == 2:
+                    label = str(prob_board_data[0])
 
-                x = board_data[0]-int(self.box_size[0]/2)
+                x = board_data[0]-int(self.box_size[0]*(1/3))
                 cv2.putText(screenshot,label,(x,board_data[1]),cv2.FONT_HERSHEY_COMPLEX,0.9,(50,50,50),2)
 
                 j += 1
