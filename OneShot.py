@@ -22,10 +22,8 @@ class Macro(object):
                     key = True
                     isPressed = True
 
-            time.sleep(0.02)
-
             if key:
-                keyboard.press_and_release('la')
+                keyboard.press_and_release('l')
                 print("Pressed")
                 key = False
             
